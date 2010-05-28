@@ -1,4 +1,10 @@
 <?php
+/**
+ * @category ErrorLog
+ * @package ErrorLog_Writer
+ * @copyright Copyright (c) 2010, Bellière Ludovic
+ * @license http://opensource.org/licenses/mit-license.php MIT license
+ */
 
 abstract class Errorlog_Writer_Abstract {
     
@@ -13,7 +19,7 @@ abstract class Errorlog_Writer_Abstract {
     abstract public function close() {}
     
     /**
-     * Store data into the log
+     * Store error data into the log
      *
      * @param string  $message
      * @param string  $file

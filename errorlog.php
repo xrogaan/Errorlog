@@ -1,10 +1,9 @@
 <?php
 /**
- * Goals: 
- *  - log all errors
- *  - stores errors in files/databases/syslog
- *  - replace php error handler
- *  - use as php exception handler.
+ * @category ErrorLog
+ * @package ErrorLog
+ * @copyright Copyright (c) 2010, Bellière Ludovic
+ * @license http://opensource.org/licenses/mit-license.php MIT license
  */
 
 require_once 'ErrorLog/Exception.php';
@@ -117,6 +116,7 @@ class ErrorLog {
     
     function logException(Exception $exception)
     {
+        $data = array();
         if ($this->dump_session_data)
         {
             $data['SESSION'] = $_SESSION;
@@ -127,6 +127,7 @@ class ErrorLog {
     
     function logPhpError($errno, $errstr, $errfile='', $errline=0, (array) $errcontext=array())
     {
+        $data = array();
         if ($this->dump_session_data)
         {
             $data['SESSION'] = $_SESSION;
@@ -157,7 +158,9 @@ class ErrorLog {
      * @param string $message
      * @param int    $errorlevel
      */ 
-    function error($message, $errorlevel) {
+    function error($message, $file, $line)
+    {
+        $this->writer->store($message, $file, $line, debug_backtrace());
     }
 	
     function registerErrorHandler($level=false)
