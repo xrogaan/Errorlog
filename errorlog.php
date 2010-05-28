@@ -91,6 +91,10 @@ class ErrorLog {
                 throw new ErrorLog_Exception('Writer object "' . $writer_name . '" couldn\'t be found.');
             }
         }
+        else
+        {
+            throw new ErrorLog_Exception('The file for the writer ' . $writer . ' couldn\'t be found.');
+        }
         return $this;
     }
     
