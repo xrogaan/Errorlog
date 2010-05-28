@@ -14,8 +14,8 @@ class ErrorLog {
     protected static $_instance = null;
     protected $dump_session_data = true;
     
-    protected $previous_error_handler = null;
-    protected $previous_exception_handler = null;
+    protected $previous_error_handler = false;
+    protected $previous_exception_handler = false;
     
     protected $writers = null;
     protected $writers_path = dirname(__FILE__).'/';
@@ -64,6 +64,15 @@ class ErrorLog {
         return $this;
     }
     
+    /**
+     * Load a writer.
+     * If self::registerExceptionHandler() is already called, it restore the default php handler before throwing anything.
+     *
+     * @param string $writer
+     * @param array  $config
+     * @throw ErrorLog_Exception on file/object missing
+     * @return ErrorLog
+     */
     protected loadWriter($writer, $config = array())
     {
         if (!is_array($config))
@@ -88,11 +97,19 @@ class ErrorLog {
             }
             else
             {
+                if ($this->previous_exception_handler === false)
+                {
+                    restore_exception_handler();
+                }
                 throw new ErrorLog_Exception('Writer object "' . $writer_name . '" couldn\'t be found.');
             }
         }
         else
         {
+            if ($this->previous_exception_handler === false)
+            {
+                restore_exception_handler();
+            }
             throw new ErrorLog_Exception('The file for the writer ' . $writer . ' couldn\'t be found.');
         }
         return $this;
