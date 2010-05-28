@@ -21,6 +21,32 @@ abstract class Errorlog_Writer_Abstract {
      * @param array   $errno (optionnal)
      * @param mixed   $extra (optionnal)
      */
-    abstract public function store($message, $file, $line, $raised, $trace, $extra) {}
+    public function store($message, $file, $line, $trace=array(), $extra=array())
+    {    
+        if (empty($trace))
+        {
+            $trace = null;
+        }
+        
+        if (empty($extra))
+        {
+            $extra = null;
+        }
+        
+        return array(
+            'message' => $message,
+            'file'    => $file,
+            'line'    => $line,
+            'raised'  => date('c'),
+            'trace'   => $trace,
+            'params'  => array(
+                'post'    => $_POST,
+                'get'     => $_GET,
+                'cookie'  => $_COOKIE
+            ),
+            'env'     => $_SERVER,
+            'extra'   => $extra
+        );
+    }
 }
 
