@@ -9,6 +9,17 @@
 require_once 'ErrorLog/Exception.php';
 
 class ErrorLog {
+    
+    // 
+    const EMERG   = 0;  // Emergency: system is unusable
+    const ALERT   = 1;  // Alert: action must be taken immediately
+    const CRIT    = 2;  // Critical: critical conditions
+    const ERR     = 3;  // Error: error conditions
+    const WARN    = 4;  // Warning: warning conditions
+    const NOTICE  = 5;  // Notice: normal, but significant, condition
+    const INFO    = 6;  // Informational: informational messages
+    const DEBUG   = 7;  // Debug: debug-level messages
+
 
     protected static $_instance = null;
     protected $dump_session_data = true;
@@ -122,7 +133,7 @@ class ErrorLog {
             $data['SESSION'] = $_SESSION;
         }
         
-        $this->writer->store($exception->getMessage(), $exception->getFile(), $exception->getLine(), $exception->getTrace(), $data);
+        $this->writer->store($exception->getMessage(), $exception->getCode(), $exception->getFile(), $exception->getLine(), $exception->getTrace(), $data);
     }
     
     function logPhpError($errno, $errstr, $errfile='', $errline=0, (array) $errcontext=array())
@@ -144,21 +155,28 @@ class ErrorLog {
     /**
      * @param string $message
      */
-    function log($message) {
+    public function log($message)
+    {
+        if (empty($message) || !is_string($message))
+        {
+            return false;
+        }    
+        $this->writer->storeMessage($message, LOG_NOTICE);
+        return true;
     }
     
     /**
      * @param string $message
      * @param int    $errorlevel
      */ 
-    static public function warn($message, $errorlevel) {
+    public function warn($message, $errorlevel) {
     }
 
     /**
      * @param string $message
      * @param int    $errorlevel
      */ 
-    function error($message, $file, $line)
+    public function error($message, $file, $line)
     {
         $this->writer->store($message, $file, $line, debug_backtrace());
     }

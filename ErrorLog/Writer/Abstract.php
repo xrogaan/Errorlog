@@ -27,7 +27,7 @@ abstract class Errorlog_Writer_Abstract {
      * @param array   $errno (optionnal)
      * @param mixed   $extra (optionnal)
      */
-    public function store($message, $file, $line, $trace=array(), $extra=array())
+    public function store($message, $severity, $file='', $line=0, $trace=array(), $extra=array())
     {    
         if (empty($trace))
         {
@@ -37,6 +37,11 @@ abstract class Errorlog_Writer_Abstract {
         if (empty($extra))
         {
             $extra = null;
+        }
+        
+        if (empty($file) && !$line)
+        {
+            $this->storeMessage($message, $severity);
         }
         
         return array(
@@ -54,5 +59,8 @@ abstract class Errorlog_Writer_Abstract {
             'extra'   => $extra
         );
     }
+    
+    protected function storeMessage($message, $severity) {}
+    protected function storeException($errstr, $code, $errfile, $errline, $traceback, $severity=0) {}
 }
 
