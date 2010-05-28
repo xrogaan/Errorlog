@@ -7,9 +7,8 @@ Planed support :
 * syslog
 * system file
 * databases
- * Mysql
- * PostGreSQL
- * Sqlite
- * MongoDB
- * etc
+** Mysql
+** PostGreSQL
+** Sqlite
+** MongoDB
 
