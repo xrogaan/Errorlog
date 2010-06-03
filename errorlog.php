@@ -19,6 +19,11 @@ class ErrorLog {
     const NOTICE  = 5;  // Notice: normal, but significant, condition
     const INFO    = 6;  // Informational: informational messages
     const DEBUG   = 7;  // Debug: debug-level messages
+	
+	const LOG_NONE      = 0x0010; // log type unreconized
+	const LOG_MESSAGE   = 0x0011; // simple message
+	const LOG_PHPERROR  = 0x0012; // php error, can be lethal
+	const LOG_EXCEPTION = 0x0013; // exception, lethal
 
 
     protected static $_instance = null;
@@ -73,6 +78,73 @@ class ErrorLog {
         
         return $this;
     }
+	
+    /**
+    *
+    */
+    protected function _write($message, $severity, $file='', $line=0, $backtrace='', $extra)
+    {
+        if (empty($message))
+        {
+            throw new ErrorLog_Exception('First parameter is required.');
+        }
+        if (!is_int($severity))
+        {
+            throw new ErrorLog_Exception('Second parameter is invalid.');
+        }
+        
+        $logType = self::LOG_NONE;
+        if (isset($extra['logType']))
+        {
+            $logType = $extra['logType'];
+            unset($extra['logType']);
+        }
+        
+        $logData = array(
+            'message' => $message,
+            'file'    => $file,
+            'line'    => $line,
+            'raised'  => date('c'),
+            'backtrace'   => $backtrace,
+            'params'  => array(
+                'post'    => $_POST,
+                'get'     => $_GET,
+                'cookie'  => $_COOKIE
+            ),
+            'env'     => $_SERVER,
+        );
+
+        if (!empty($extra))
+        {
+            if (is_array($extra))
+            {
+                $info = array();
+                foreach ($extra as $key => $value)
+                {
+                    if (is_string($key))
+                    {
+                        $logData[$key] = $value;
+                    }
+                    else
+                    {
+                        $info[] = $value;
+                    }
+                }
+            } else
+            {
+                $info = $extra;
+            }
+
+            if (!empty($info))
+            {
+                $logData['info'] = $info;
+            }
+        }
+        
+        foreach($this->writers as $writer) {
+            $writer->store($logData,$logType);
+        }
+    }
     
     /**
      * Load a writer.
@@ -83,7 +155,7 @@ class ErrorLog {
      * @throw ErrorLog_Exception on file/object missing
      * @return ErrorLog
      */
-    protected loadWriter($writer, $config = array())
+    protected function loadWriter($writer, $config = array())
     {
         if (!is_array($config))
         {
