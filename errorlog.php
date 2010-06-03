@@ -210,7 +210,7 @@ class ErrorLog {
             $data['SESSION'] = $_SESSION;
         }
         
-        $this->writer->store($exception->getMessage(), $exception->getCode(), $exception->getFile(), $exception->getLine(), $exception->getTrace(), $data);
+        $this->write($exception->getMessage(), $exception->getCode(), $exception->getFile(), $exception->getLine(), $exception->getTrace(), $data);
     }
     
     function logPhpError($errno, $errstr, $errfile='', $errline=0, (array) $errcontext=array())
@@ -226,7 +226,7 @@ class ErrorLog {
             $data['errorcontext'] = $errorcontext;
         }
         
-        $this->writer->store($errstr, $errfile, $errline, null, $data);
+        $this->write($errstr, $errno, $errfile, $errline, null, $data);
     }
 
     /**
@@ -238,7 +238,7 @@ class ErrorLog {
         {
             return false;
         }    
-        $this->writer->storeMessage($message, LOG_NOTICE);
+        $this->write($message, self::NOTICE);
         return true;
     }
     
@@ -246,16 +246,28 @@ class ErrorLog {
      * @param string $message
      * @param int    $errorlevel
      */ 
-    public function warn($message, $errorlevel) {
+    public function warn($message, $errorlevel=4)
+    {
+        if (empty($message) || !is_string($message))
+        {
+            return false;
+        }    
+        $this->write($message, $errorlevel);
+        return true;
     }
 
     /**
      * @param string $message
      * @param int    $errorlevel
      */ 
-    public function error($message, $file, $line)
+    public function error($message, $file, $line, $severity=3)
     {
-        $this->writer->store($message, $file, $line, debug_backtrace());
+        if (empty($message) || !is_string($message))
+        {
+            return false;
+        }   
+        $this->write($message, $severity, $file, $line, debug_backtrace());
+        return true;
     }
 	
     function registerErrorHandler($level=false)
