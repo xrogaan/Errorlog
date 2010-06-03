@@ -82,7 +82,7 @@ class ErrorLog {
     /**
     *
     */
-    protected function _write($message, $severity, $file='', $line=0, $backtrace='', $extra)
+    public function write($message, $severity, $file='', $line=0, $backtrace='', $extra)
     {
         if (empty($message))
         {
@@ -141,7 +141,12 @@ class ErrorLog {
             }
         }
         
-        foreach($this->writers as $writer) {
+        self::_write($logData, $logType);
+    }
+    
+    protected function _write($logData, $logType) {
+        foreach($this->writers as $writer)
+        {
             $writer->store($logData,$logType);
         }
     }
