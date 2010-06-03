@@ -12,3 +12,4 @@ Planed support :
   * Sqlite
   * MongoDB
 
+Support / bug report / feature requests on http://xrogaan.lighthouseapp.com/projects/53392-errorlog
