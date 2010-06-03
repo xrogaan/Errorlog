@@ -184,7 +184,7 @@ class ErrorLog {
             }
             else
             {
-                if ($this->previous_exception_handler === false)
+                if ($this->previous_exception_handler !== false)
                 {
                     restore_exception_handler();
                 }
@@ -193,7 +193,7 @@ class ErrorLog {
         }
         else
         {
-            if ($this->previous_exception_handler === false)
+            if ($this->previous_exception_handler !== false)
             {
                 restore_exception_handler();
             }
