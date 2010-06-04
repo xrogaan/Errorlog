@@ -101,17 +101,18 @@ class ErrorLog {
         }
         
         $logData = array(
-            'message' => $message,
-            'file'    => $file,
-            'line'    => $line,
-            'raised'  => date('c'),
-            'backtrace'   => $backtrace,
-            'params'  => array(
+            'message'   => $message,
+            'severity'  => $severity,
+            'file'      => $file,
+            'line'      => $line,
+            'raised'    => date('c'),
+            'backtrace' => $backtrace,
+            'params'    => array(
                 'post'    => $_POST,
                 'get'     => $_GET,
                 'cookie'  => $_COOKIE
             ),
-            'env'     => $_SERVER,
+            'env'       => $_SERVER,
         );
 
         if (!empty($extra))
