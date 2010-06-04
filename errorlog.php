@@ -33,9 +33,11 @@ class ErrorLog {
     protected $previous_exception_handler = false;
     
     protected $writers = null;
-    protected $writers_path = dirname(__FILE__).'/';
+    protected $writers_path = null;
     
-    protected function __construct() {}
+    protected function __construct() {
+        self::$writers_path = dirname(__FILE__).'/';
+    }
     
     public static function init()
     {
@@ -82,7 +84,7 @@ class ErrorLog {
     /**
     *
     */
-    public function write($message, $severity, $file='', $line=0, $backtrace='', $extra)
+    public function write($message, $severity, $file='', $line=0, $backtrace='', $extra=array())
     {
         if (empty($message))
         {
@@ -216,14 +218,14 @@ class ErrorLog {
             'severity'   => $exception->getCode(),
             'file'       => $exception->getFile(),
             'line'       => $exception->getLine(),
-            'extra'      => $data
-            'backtrace'  => $exception->getTrace()()
+            'extra'      => $data,
+            'backtrace'  => $exception->getTrace(),
         );
         
         $this->write($logData, self::LOG_EXCEPTION);
     }
     
-    function logPhpError($errno, $errstr, $errfile='', $errline=0, (array) $errcontext=array())
+    function logPhpError($errno, $errstr, $errfile='', $errline=0, array $errcontext=array())
     {
         $data = array();
         if ($this->dump_session_data)
@@ -241,7 +243,7 @@ class ErrorLog {
             'severity'   => $errno,
             'file'       => $errfile,
             'line'       => $errline,
-            'extra'      => $data
+            'extra'      => $data,
             'backtrace'  => debug_backtrace()
         );
         
