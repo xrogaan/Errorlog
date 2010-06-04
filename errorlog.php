@@ -211,7 +211,16 @@ class ErrorLog {
             $data['SESSION'] = $_SESSION;
         }
         
-        $this->write($exception->getMessage(), $exception->getCode(), $exception->getFile(), $exception->getLine(), $exception->getTrace(), $data);
+        $logData = array(
+            'message'    => $exception->getMessage(),
+            'severity'   => $exception->getCode(),
+            'file'       => $exception->getFile(),
+            'line'       => $exception->getLine(),
+            'extra'      => $data
+            'backtrace'  => $exception->getTrace()()
+        );
+        
+        $this->write($logData, self::LOG_EXCEPTION);
     }
     
     function logPhpError($errno, $errstr, $errfile='', $errline=0, (array) $errcontext=array())
@@ -227,7 +236,16 @@ class ErrorLog {
             $data['errorcontext'] = $errorcontext;
         }
         
-        $this->write($errstr, $errno, $errfile, $errline, null, $data);
+        $logData = array(
+            'message'    => $errstr,
+            'severity'   => $errno,
+            'file'       => $errfile,
+            'line'       => $errline,
+            'extra'      => $data
+            'backtrace'  => debug_backtrace()
+        );
+        
+        $this->write($logData, self::LOG_PHPERROR);
     }
 
     /**
