@@ -32,50 +32,23 @@ abstract class Errorlog_Writer_Abstract {
      * @param array   $errno (optionnal)
      * @param mixed   $extra (optionnal)
      */
-    public function store($message, $severity, $file='', $line=0, $trace=array(), $extra=null)
+    public function store($logData, $logType)
     {    
-        if (empty($trace))
+        switch ($logType)
         {
-            $trace = null;
-        }
-
-        
-        if (empty($file) && !$line)
-        {
-            $this->storeMessage($message, $severity);
-        }
-        
-       $logData = array(
-            'message' => $message,
-            'file'    => $file,
-            'line'    => $line,
-            'raised'  => date('c'),
-            'trace'   => $trace,
-            'params'  => array(
-                'post'    => $_POST,
-                'get'     => $_GET,
-                'cookie'  => $_COOKIE
-            ),
-            'env'     => $_SERVER,
-        );
-
-        if (!empty($extra)) {
-            if (is_array($extra)) {
-                $info = array();
-                foreach ($extra as $key => $value) {
-                    if (is_string($key)) {
-                        $logData[$key] = $value;
-                    } else {
-                        $info[] = $value;
-                    }
-                }
-            } else {
-                $info = $extra;
-            }
-
-            if (!empty($info)) {
-                $logData['info'] = $info;
-            }
+            default:
+            case ErrorLog::LOG_NONE:
+                self::storeUndefined($logData);
+                break;
+            case ErrorLog::LOG_MESSAGE:
+                self::storeMessage($logData);
+                break;
+            case ErrorLog::LOG_PHPERROR:
+                self::storePhpError($logData);
+                break;
+            case ErrorLog::LOG_EXCEPTION:
+                self::storeException($logData);
+                break;
         }
     }
     
@@ -85,25 +58,18 @@ abstract class Errorlog_Writer_Abstract {
             'severity' => $severity
         );
     }
+    
+    protected function storePhpError($logData) {
+        $required = array('message','severity','file','line','raised','env');
+    }
 
-    protected function storeException($errstr, $code, $errfile, $errline, $traceback, $severity=0) {
+    protected function storeException($logData) {
 
-        if (is_null($severity) && $code !== false) {
-            $severity = $code;
+        if (empty($logData['backtrace'])) {
+            $logData['backtrace'] = debug_backtrace();
         }
 
-        if (empty($traceback)) {
-            $traceback = debug_backtrace();
-        }
-
-        return array(
-            'message'   => $errstr,
-            'severity'  => $severity,
-            'file'      => $errfile,
-            'line'      => $errline,
-            'traceback' => $traceback,
-            'code'      => $code
-        );
+        return $logData;
     }
 }
 
