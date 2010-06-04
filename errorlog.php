@@ -20,10 +20,10 @@ class ErrorLog {
     const INFO    = 6;  // Informational: informational messages
     const DEBUG   = 7;  // Debug: debug-level messages
 	
-	const LOG_NONE      = 0x0010; // log type unreconized
-	const LOG_MESSAGE   = 0x0011; // simple message
-	const LOG_PHPERROR  = 0x0012; // php error, can be lethal
-	const LOG_EXCEPTION = 0x0013; // exception, lethal
+    const LOG_NONE      = 0x0010; // log type unreconized
+    const LOG_MESSAGE   = 0x0011; // simple message
+    const LOG_PHPERROR  = 0x0012; // php error, can be lethal
+    const LOG_EXCEPTION = 0x0013; // exception, lethal
 
 
     protected static $_instance = null;
@@ -205,7 +205,7 @@ class ErrorLog {
         return $this;
     }
     
-    function logException(Exception $exception)
+    public function logException(Exception $exception)
     {
         $data = array();
         if ($this->dump_session_data)
@@ -225,7 +225,7 @@ class ErrorLog {
         $this->write($logData, self::LOG_EXCEPTION);
     }
     
-    function logPhpError($errno, $errstr, $errfile='', $errline=0, array $errcontext=array())
+    public function logPhpError($errno, $errstr, $errfile='', $errline=0, array $errcontext=array())
     {
         $data = array();
         if ($this->dump_session_data)
@@ -291,7 +291,7 @@ class ErrorLog {
         return true;
     }
 	
-    function registerErrorHandler($level=false)
+    public function registerErrorHandler($level=false)
     {
         if ($level === false)
         {
@@ -301,9 +301,24 @@ class ErrorLog {
         $this->previous_error_handler = set_error_handler(array($this, 'logPhpError'), $level);
     }
     
-    function registerExceptionHandler()
+    public function registerExceptionHandler()
     {
         $this->previous_exception_handler = set_exception_handler(array($this, 'logException'));
+    }
+
+    static public function getErrorLevelLabel($errorLevel)
+    {
+        $r = new ReflectionClass('ErrorLog');
+        $constants = array_flip($r->getConstants());
+
+        if (array_key_exists($errorLevel, $constants) && strpos($constants[$errorLevel], 'LOG_') === false)
+        {
+            return $constants[$errorLevel];
+        }
+        else
+        {
+            return false;
+        }
     }
 }
 
