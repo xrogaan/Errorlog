@@ -7,6 +7,10 @@
  */
 
 abstract class Errorlog_Writer_Abstract {
+
+    protected $_format;
+
+    const DEFAULT_FORMAT = '%timestamp% %errorName% (%errorLevel%): %message%';
     
     /**
      * Open a log ressource.
@@ -26,11 +30,8 @@ abstract class Errorlog_Writer_Abstract {
     /**
      * Store error data into the log
      *
-     * @param string  $message
-     * @param string  $file
-     * @param integer $line
-     * @param array   $errno (optionnal)
-     * @param mixed   $extra (optionnal)
+     * @param array  $logData
+     * @param integer  $logType
      */
     public function store($logData, $logType)
     {    
