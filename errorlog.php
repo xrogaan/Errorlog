@@ -34,6 +34,19 @@ class ErrorLog {
     
     protected $writers = null;
     protected $writers_path = null;
+
+    /**
+     * Highter value of this will be ignored.
+     *
+     * @var integer
+     */
+    protected $_logLevel = 5;
+
+    /**
+     * List of writer where filters don't apply.
+     * @var array
+     */
+    protected $_logLevelException = array();
     
     protected function __construct($config)
     {
@@ -55,6 +68,16 @@ class ErrorLog {
         if (isset($config['dump_session_data']))
         {
             $this->dump_session_data = (bool) $config['dump_session_data'];
+        }
+
+        if (isset($config['logLevel'])) {
+            if (self::getErrorLevelLabel($config['logLevel']) !== false) {
+                self::setLogLevel($config['logLevel']);
+            }
+            if (isset($config['logLevelException']))
+            {
+                $this->_logLevelException = (array) $config['logLevelException'];
+            }
         }
     }
     
@@ -142,11 +165,21 @@ class ErrorLog {
         
         self::_write($logData, $logType);
     }
-    
+
+    /**
+     * Send data to the loaded writers.
+     * Apply a basic filter on the severity level.
+     *
+     * @param array   $logData
+     * @param integer $logType
+     */
     protected function _write($logData, $logType) {
-        foreach($this->writers as $writer)
+        foreach($this->writers as $writername => $writer)
         {
-            $writer->store($logData,$logType);
+            if (!in_array($writername, $this->_logLevelException) && $logData['severity'] <= $this->_logLevel)
+            {
+                $writer->store($logData,$logType);
+            }
         }
     }
     
@@ -199,6 +232,11 @@ class ErrorLog {
             throw new ErrorLog_Exception('The file for the writer ' . $writer . ' couldn\'t be found.');
         }
         return $this;
+    }
+
+    public function setLogLevel($loglevel)
+    {
+        $this->_logLevel = $loglevel;
     }
     
     public function logException(Exception $exception)
