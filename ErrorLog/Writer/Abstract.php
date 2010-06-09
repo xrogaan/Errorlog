@@ -136,7 +136,8 @@ abstract class Errorlog_Writer_Abstract {
      * @param string  $format
      * @param integer $logType
      */
-    public function setFormat($format,$logType='ALL') {
+    public function setFormat($format,$logType='ALL')
+    {
         if (empty($format))
         {
             throw new ErrorException('Trying to override the format with an empty value.');
@@ -170,18 +171,40 @@ abstract class Errorlog_Writer_Abstract {
         {
             if (is_array($value))
             {
-                $tmpTable = '<table>';
-                foreach ($value as $tableKey => $tableValue)
+                if ($key == 'extra' || $key == 'params' || $key == 'env')
                 {
-                    $tmpTable.= '<tr><td>' . $tableKey . '</td><td>' . $tableValue . '</td></tr>';
+                    $tmpValue = array();
+                    foreach ($value as $extraKey => $extraValue)
+                    {
+                        if (is_array($extraValue))
+                        {
+                            $extraValue = self::buildMessageFromArray($extraValue);
+                        }
+                        $tmpValue[$extraKey] = $extraValue;
+                    }
+                    $value = $tmpValue;
+                    unset($tmpValue);
                 }
-                $tmpTable.= '</table>';
-                $value = $tmpTable;
-                unset($tmpTable);
+                $value = self::buildMessageFromArray($value);
             }
             str_replace($key, $value, $format);
         }
         return $format;
+    }
+
+    protected function buildMessageFromArray(array $array) {
+        if (empty($array))
+        {
+            return '';
+        }
+
+        $tmpTable = '<table>';
+        foreach ($array as $tableKey => $tableValue)
+        {
+            $tmpTable.= '<tr><td>' . $tableKey . '</td><td>' . $tableValue . '</td></tr>';
+        }
+        $tmpTable.= '</table>';
+        return $tmpTable;
     }
 
     /**
@@ -191,11 +214,13 @@ abstract class Errorlog_Writer_Abstract {
      * @return boolean
      */
     protected function checkDefaultKeys (array $extraKey=array()) {
-        if (is_null($this->_logData)) {
+        if (is_null($this->_logData))
+        {
             return false;
         }
         $check = array_flip(array_merge(array('raised', 'env', 'params'), $extraKey));
-        if ($n=count(array_diff_key($check, $this->_logData)) >= 1) {
+        if ($n=count(array_diff_key($check, $this->_logData)) >= 1)
+        {
             throw new ErrorLog_Exception($n . ' required key are missing from the report.');
         }
         return true;
