@@ -35,13 +35,32 @@ class ErrorLog {
     protected $writers = null;
     protected $writers_path = null;
     
-    protected function __construct() {
-        self::$writers_path = dirname(__FILE__).'/';
+    protected function __construct($config)
+    {
+        self::$writers_path = dirname(__FILE__).'/Writer/';
+
+        if (!is_array($config))
+        {
+            $config = (array) $config;
+        }
+
+        if (isset($config['writers']) && is_array($config['writers']))
+        {
+            foreach($config['writers'] as $writer => $writer_config)
+            {
+                self::loadWriter($writer, $writer_config);
+            }
+        }
+
+        if (isset($config['dump_session_data']))
+        {
+            $this->dump_session_data = (bool) $config['dump_session_data'];
+        }
     }
     
-    public static function init()
+    protected static function init($config)
     {
-        return static::$_instance = new static();
+        return static::$_instance = new static($config);
     }
     
     /**
@@ -50,35 +69,12 @@ class ErrorLog {
      * @param boolean $auto_create
      * @return ErrorLog|null
      */
-    public static function getInstance($auto_create = true)
+    public static function getInstance($config = array(), $auto_create = true)
     {
         if ((bool) $auto_create && is_null(static::$_instance)) {
-            static::init();
+            static::init($config);
         }
         return static::$_instance;
-    }
-    
-    public function factory($config = array())
-    {
-        if (!is_array($config))
-        {
-            $config = (array) $config;
-        }
-        
-        if (isset($config['writers']) && is_array($config['writers']))
-        {
-            foreach($config['writers'] as $writer => $writer_config)
-            {
-                self::loadWriter($writer, $writer_config);
-            }
-        }
-        
-        if (isset($config['dump_session_data']))
-        {
-            $this->dump_session_data = (bool) $config['dump_session_data'];
-        }
-        
-        return $this;
     }
 	
     /**
