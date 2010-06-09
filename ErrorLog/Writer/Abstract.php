@@ -93,7 +93,7 @@ abstract class Errorlog_Writer_Abstract {
     
     protected function storePhpError($logData)
     {
-        $this->logData = $logData;
+        $this->_logData = $logData;
         $required = array('message','severity','file','line');
         if (self::checkDefaultKeys($required))
         {
@@ -106,7 +106,7 @@ abstract class Errorlog_Writer_Abstract {
         if (empty($logData['backtrace'])) {
             $logData['backtrace'] = debug_backtrace();
         }
-        $this->logData = $logData;
+        $this->_logData = $logData;
         $required = array('message','severity','file','line');
         if (self::checkDefaultKeys($required))
         {
