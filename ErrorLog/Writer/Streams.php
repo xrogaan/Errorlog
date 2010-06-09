@@ -21,13 +21,12 @@ class ErrorLog_Writer_Streams extends Errorlog_Writer_Abstract
     protected function init()
     {
 
-        if (isset($this->config['url'])) { // write to an url
-            //
-        } elseif (isset($this->config['stream'])) { // write to an existing stream
+        if (isset($this->config['stream'])) { // write to an existing stream
             if (get_resource_type($this->config['stream']) != 'stream')
             {
                 throw new ErrorLog_Exception('Resource is not a stream.');
             }
+            $this->handler = $this->config['stream'];
         } elseif (isset($this->config['file'])) { // write to a file
             if (!isset($this->config['mode']))
             {
@@ -35,9 +34,9 @@ class ErrorLog_Writer_Streams extends Errorlog_Writer_Abstract
             }
             $this->mode     = $this->config['mode'];
             $this->filename = $this->config['file'];
-            if (!file_exists($this->filename))
+            if (strpos($this->filename, '://') === false)
             {
-                if (!is_writable(dirname($this->filename)))
+                if (!file_exists($this->filename) && !is_writable(dirname($this->filename)))
                 {
                     throw new ErrorLog_Exception("Can't write to file.");
                 }
