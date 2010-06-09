@@ -320,5 +320,13 @@ class ErrorLog {
             return false;
         }
     }
+
+    public function __destruct()
+    {
+        foreach ($this->writers as $name => $object)
+        {
+            $object->close();
+        }
+    }
 }
 
