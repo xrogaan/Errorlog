@@ -8,6 +8,7 @@
 
 abstract class Errorlog_Writer_Abstract {
 
+    protected $_config;
     protected $_format;
     protected $_logData;
     protected $_activeLogType;
@@ -15,7 +16,10 @@ abstract class Errorlog_Writer_Abstract {
 
     const DEFAULT_FORMAT = '%timestamp% %errorName% (%errorLevel%): %message%';
 
-    public function __construct() {
+    public function __construct($config=array()) {
+
+        $this->_config = $config;
+
         $this->_activeLogType = array(
             ErrorLog::LOG_NONE,
             ErrorLog::LOG_MESSAGE,
@@ -147,7 +151,7 @@ abstract class Errorlog_Writer_Abstract {
              */
             //throw new ErrorException('Invalid logType given.');
             $format = self::DEFAULT_FORMAT;
-            $this->_logData['extra'] = 'WARNING: Invalid logType given. You are seeing the default log format';
+            $this->_logData['extra'][] = 'WARNING: Invalid logType given. You are seeing the default log format';
         }
 
         $this->_format[$logType] = $format;
