@@ -295,7 +295,7 @@ class ErrorLog {
         {
             return false;
         }    
-        $this->write($message, self::NOTICE);
+        $this->write($message, self::INFO);
         return true;
     }
     
