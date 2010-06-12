@@ -27,10 +27,10 @@ abstract class Errorlog_Writer_Abstract {
             ErrorLog::LOG_EXCEPTION
         );
 
-        self::init();
+        $this->init();
     }
 
-    abstract function init();
+    abstract protected function init();
 
     /**
      * Open a log ressource.
@@ -77,7 +77,7 @@ abstract class Errorlog_Writer_Abstract {
     {
         $this->_logData = $logData;
         if (self::checkDefaultKeys()) {
-            self::_write();
+            $this->_write();
         }
     }
 
@@ -87,7 +87,7 @@ abstract class Errorlog_Writer_Abstract {
         $required = array('message', 'severity');
         if (self::checkDefaultKeys($required))
         {
-            self::_write();
+            $this->_write();
         }
     }
     
@@ -97,7 +97,7 @@ abstract class Errorlog_Writer_Abstract {
         $required = array('message','severity','file','line');
         if (self::checkDefaultKeys($required))
         {
-            self::_write();
+            $this->_write();
         }
     }
 
@@ -110,7 +110,7 @@ abstract class Errorlog_Writer_Abstract {
         $required = array('message','severity','file','line');
         if (self::checkDefaultKeys($required))
         {
-            self::_write();
+            $this->_write();
         }
     }
 

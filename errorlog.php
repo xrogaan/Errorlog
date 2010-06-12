@@ -50,7 +50,7 @@ class ErrorLog {
     
     protected function __construct($config)
     {
-        self::$writers_path = dirname(__FILE__).'/Writer/';
+        $this->writers_path = dirname(__FILE__).'/ErrorLog/Writer/';
 
         if (!is_array($config))
         {
@@ -199,19 +199,21 @@ class ErrorLog {
             $config = (array) $config;
         }
         
-        if (file_exists($this->writers_path . $writer))
+        $writer = ucfirst($writer);
+        
+        if (file_exists($this->writers_path . $writer . '.php'))
         {
-            require $this->writers_path . $writer;
+            require $this->writers_path . $writer . '.php';
             $writer_name = 'ErrorLog_Writer_' . $writer;
             if (class_exists($writer_name))
             {
                 if (empty($config))
                 {
-                    $this->writers[$writer] = new $writer_name();
+                    $this->writers[strtolower($writer)] = new $writer_name();
                 }
                 else
                 {
-                    $this->writers[$writer] = new $writer_name($config);
+                    $this->writers[strtolower($writer)] = new $writer_name($config);
                 }
             }
             else
@@ -357,9 +359,12 @@ class ErrorLog {
 
     public function __destruct()
     {
-        foreach ($this->writers as $name => $object)
+        if (!empty($this->writers))
         {
-            $object->close();
+            foreach ($this->writers as $name => $object)
+            {
+                $object->close();
+            }
         }
     }
 }
