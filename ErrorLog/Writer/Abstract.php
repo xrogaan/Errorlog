@@ -14,13 +14,13 @@ abstract class Errorlog_Writer_Abstract {
     protected $_activeLogType;
     protected $_logTypes;
 
-    const DEFAULT_FORMAT = '%timestamp% %errorName% (%errorLevel%): %message%';
+    const DEFAULT_FORMAT = "%timestamp% %errorName% (%errorLevel%): %message%\n";
 
     public function __construct($config=array()) {
 
         $this->_config = $config;
 
-        $this->_activeLogType = array(
+        $this->_logTypes = array(
             ErrorLog::LOG_NONE,
             ErrorLog::LOG_MESSAGE,
             ErrorLog::LOG_PHPERROR,
@@ -55,79 +55,54 @@ abstract class Errorlog_Writer_Abstract {
      */
     public function store($logData, $logType)
     {    
+        self::setType($logType);
+        
         switch ($logType)
         {
             default:
             case ErrorLog::LOG_NONE:
-                self::storeUndefined($logData);
+                $required = array();
                 break;
             case ErrorLog::LOG_MESSAGE:
-                self::storeMessage($logData);
+                $required = array('message', 'severity');
                 break;
             case ErrorLog::LOG_PHPERROR:
-                self::storePhpError($logData);
+                $required = array('message','severity','file','line');
                 break;
             case ErrorLog::LOG_EXCEPTION:
-                self::storeException($logData);
+                if (empty($logData['backtrace']))
+                {
+                    $logData['backtrace'] = debug_backtrace();
+                }
+                $required = array('message','severity','file','line');
                 break;
         }
-    }
-
-    protected function storeUndefined($logData)
-    {
+        
+        $logData['errorName']  = ErrorLog::getErrorLevelLabel($logData['severity']);
+        $logData['errorLevel'] = $logData['severity'];
+        
         $this->_logData = $logData;
-        if (self::checkDefaultKeys()) {
-            $this->_write();
-        }
-    }
-
-    protected function storeMessage($logData)
-    {
-        $this->_logData = $logData;
-        $required = array('message', 'severity');
+        
         if (self::checkDefaultKeys($required))
         {
             $this->_write();
         }
     }
     
-    protected function storePhpError($logData)
-    {
-        $this->_logData = $logData;
-        $required = array('message','severity','file','line');
-        if (self::checkDefaultKeys($required))
-        {
-            $this->_write();
-        }
-    }
-
-    protected function storeException($logData)
-    {
-        if (empty($logData['backtrace'])) {
-            $logData['backtrace'] = debug_backtrace();
-        }
-        $this->_logData = $logData;
-        $required = array('message','severity','file','line');
-        if (self::checkDefaultKeys($required))
-        {
-            $this->_write();
-        }
-    }
-
     /**
      * Set the current log type.
      *
      * If the given arguement doesn't match the active log types, an exception
      * is raised.
      *
-     * @param integer $type
+     * @param integer $logType
      */
-    protected function setType($type) {
-        if (!in_array($logType, $this->_activeLogType))
+    protected function setType($logType) {
+        if (!in_array($logType, $this->_logTypes))
         {
-            throw new ErrorLog_Exception('The logType given does not exists or isn\'t active.');
+            throw new ErrorLog_Exception('The logType given ('.$logType.') does not exists or isn\'t active.');
         }
-        $this->_logType = $type;
+        $this->_activeLogType = $logType;
     }
 
     /**
@@ -140,10 +115,10 @@ abstract class Errorlog_Writer_Abstract {
     {
         if (empty($format))
         {
-            throw new ErrorException('Trying to override the format with an empty value.');
+            throw new ErrorLog_Exception('Trying to override the format with an empty value.');
         }
 
-        if (!in_array($logType, $this->_activeLogType))
+        if ($logType != 'ALL' && !in_array($logType, $this->_logTypes))
         {
             /*
              * instead of throwing an error and spoil the original error message
@@ -169,6 +144,11 @@ abstract class Errorlog_Writer_Abstract {
         $format = (!is_null($this->_format)) ? $this->_format : self::DEFAULT_FORMAT;
         foreach ($this->_logData as $key => $value)
         {
+            if ($key == 'raised')
+            {
+                $key = 'timestamp';
+            }
+            
             if (is_array($value))
             {
                 if ($key == 'extra' || $key == 'params' || $key == 'env')
@@ -187,7 +167,7 @@ abstract class Errorlog_Writer_Abstract {
                 }
                 $value = self::buildMessageFromArray($value);
             }
-            str_replace($key, $value, $format);
+            $format = str_replace("%$key%", $value, $format);
         }
         return $format;
     }
