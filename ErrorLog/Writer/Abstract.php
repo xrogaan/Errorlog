@@ -26,6 +26,15 @@ abstract class Errorlog_Writer_Abstract {
             ErrorLog::LOG_PHPERROR,
             ErrorLog::LOG_EXCEPTION
         );
+        
+        if (array_key_exists('formatter', $this->_config)) {
+            if (is_array($this->_config['formatter'])) {
+                foreach($this->_config['formatter'] as $type => $format) {
+                    $this->setFormat($format, $type);
+                } else {
+                    $this->setFormat($this->_config['formatter']['format'], $this->_config['formatter']['type']);
+                }
+        }
 
         $this->init();
     }
@@ -108,8 +117,8 @@ abstract class Errorlog_Writer_Abstract {
     /**
      * Register a format for the given log type.
      *
-     * @param string  $format
-     * @param integer $logType
+     * @param string  $format  Format specifier for log message.
+     * @param integer $logType Kind of log to process.
      */
     public function setFormat($format,$logType='ALL')
     {
@@ -134,14 +143,14 @@ abstract class Errorlog_Writer_Abstract {
     }
 
     /**
-     * Format with data and return the message.
+     * Formats data and return the message.
      *
      * @return string
      */
     public function getMessage()
     {
         $tmpTable = '';
-        $format = (!is_null($this->_format)) ? $this->_format : self::DEFAULT_FORMAT;
+        $format = (!is_null($this->_format)) ? $this->_format[$this->_activeLogType] : self::DEFAULT_FORMAT;
         foreach ($this->_logData as $key => $value)
         {
             if ($key == 'raised')
@@ -172,6 +181,12 @@ abstract class Errorlog_Writer_Abstract {
         return $format;
     }
 
+    /**
+     * Formats data from an array to a html table then return it.
+     * 
+     * @param array $array 
+     * @return string      Formatted string
+     */
     protected function buildMessageFromArray(array $array) {
         if (empty($array))
         {
