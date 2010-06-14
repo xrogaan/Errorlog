@@ -9,8 +9,12 @@
 require_once 'ErrorLog/Writer/Abstract.php';
 
 /**
- * Description of Streams
+ * Write messages in a file.
  *
+ * @category ErrorLog
+ * @package ErrorLog_Writer
+ * @copyright Copyright (c) 2010, Ludovic Bellière
+ * @license http://opensource.org/licenses/mit-license.php MIT license
  * @author Ludovic Bellière
  */
 class ErrorLog_Writer_Streams extends Errorlog_Writer_Abstract
