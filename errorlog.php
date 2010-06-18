@@ -136,7 +136,7 @@ class ErrorLog {
             'env'       => $_SERVER,
         );
         
-        if ($this->dump_session_data) {
+        if ($this->dump_session_data && isset($_SESSION)) {
             $logData['session'] = $_SESSION;
         }
 
@@ -247,39 +247,21 @@ class ErrorLog {
     
     public function logException(Exception $exception)
     {
-        $data = array();
+        $extra = array('logType' => self::LOG_EXCEPTION);
         
-        $logData = array(
-            'message'    => $exception->getMessage(),
-            'severity'   => $exception->getCode(),
-            'file'       => $exception->getFile(),
-            'line'       => $exception->getLine(),
-            'extra'      => $data,
-            'backtrace'  => $exception->getTrace(),
-        );
-        
-        $this->write($logData, self::LOG_EXCEPTION);
+        $this->write($exception->getMessage(), $exception->getCode(), $exception->getFile(), $exception->getLine(), $exception->getTraceAsString(), $extra);
     }
     
     public function logPhpError($errno, $errstr, $errfile='', $errline=0, array $errcontext=array())
     {
-        $data = array();
+        $data = array('logType' => self::LOG_PHPERROR);
         
         if (!empty($errorcontext))
         {
             $data['errorcontext'] = $errorcontext;
         }
         
-        $logData = array(
-            'message'    => $errstr,
-            'severity'   => $errno,
-            'file'       => $errfile,
-            'line'       => $errline,
-            'extra'      => $data,
-            'backtrace'  => debug_backtrace()
-        );
-        
-        $this->write($logData, self::LOG_PHPERROR);
+        $this->write($errstr, $errno, $errfile, $errline, debug_backtrace(), $data);
     }
 
     /**
@@ -291,7 +273,7 @@ class ErrorLog {
         {
             return false;
         }    
-        $this->write($message, self::INFO);
+        $this->write($message, self::INFO, '', 0, '', array('logType' => self::LOG_MESSAGE));
         return true;
     }
     
@@ -305,7 +287,7 @@ class ErrorLog {
         {
             return false;
         }    
-        $this->write($message, $errorlevel);
+        $this->write($message, $errorlevel, '', 0, '', array('logType' => self::LOG_MESSAGE));
         return true;
     }
 
@@ -319,7 +301,7 @@ class ErrorLog {
         {
             return false;
         }   
-        $this->write($message, $severity, $file, $line, debug_backtrace());
+        $this->write($message, $severity, $file, $line, debug_backtrace(), array('logType' => self::LOG_MESSAGE));
         return true;
     }
 	
