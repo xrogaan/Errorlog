@@ -135,6 +135,10 @@ class ErrorLog {
             ),
             'env'       => $_SERVER,
         );
+        
+        if ($this->dump_session_data) {
+            $logData['session'] = $_SESSION;
+        }
 
         if (!empty($extra))
         {
