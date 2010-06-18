@@ -13,7 +13,7 @@ abstract class Errorlog_Writer_Abstract {
     protected $_logData;
     protected $_activeLogType;
     protected $_logTypes;
-
+    
     const DEFAULT_FORMAT = "%timestamp% %errorName% (%errorLevel%): %message%\n";
 
     public function __construct($config=array()) {
@@ -27,13 +27,33 @@ abstract class Errorlog_Writer_Abstract {
             ErrorLog::LOG_EXCEPTION
         );
         
+        $exceptionDefaultFormat = <<<EOF
+An exception occured while bootstrapping the application.
+=========================================================
+%timestamp% %errorName% (%errorLevel%) : %message%
+
+Stack Trace:
+%backtrace%
+EOF;
+        $phperrorDefaultFormat = <<<EOF
+An error occured while bootstrapping the application.
+=====================================================
+%timestamp% %file (%line) : %message%
+EOF;
+        $defaultFormat = "%timestamp% %errorName% (%errorLevel%): %message%\n";
+
+        $this->setFormat($exceptionDefaultFormat, ErrorLog::LOG_EXCEPTION);
+        $this->setFormat($phperrorDefaultFormat, ErrorLog::LOG_PHPERROR);
+        $this->setFormat($defaultFormat, ErrorLog::LOG_MESSAGE);
+
         if (array_key_exists('formatter', $this->_config)) {
             if (is_array($this->_config['formatter'])) {
                 foreach($this->_config['formatter'] as $type => $format) {
                     $this->setFormat($format, $type);
-                } else {
-                    $this->setFormat($this->_config['formatter']['format'], $this->_config['formatter']['type']);
                 }
+             } else {
+                $this->setFormat($this->_config['formatter']['format'], $this->_config['formatter']['type']);
+            }
         }
 
         $this->init();
@@ -122,24 +142,28 @@ abstract class Errorlog_Writer_Abstract {
      */
     public function setFormat($format,$logType='ALL')
     {
-        if (empty($format))
-        {
+        if (empty($format)) {
             throw new ErrorLog_Exception('Trying to override the format with an empty value.');
         }
 
-        if ($logType != 'ALL' && !in_array($logType, $this->_logTypes))
-        {
+        if ($logType != 'ALL' && !in_array($logType, $this->_logTypes)) {
             /*
              * instead of throwing an error and spoil the original error message
              * we will just add a notice to the end of the current message and
              * use the default format.
              */
             //throw new ErrorException('Invalid logType given.');
-            $format = self::DEFAULT_FORMAT;
+            $logType = self::DEFAULT_FORMAT;
             $this->_logData['extra'][] = 'WARNING: Invalid logType given. You are seeing the default log format';
         }
-
-        $this->_format[$logType] = $format;
+        
+        if ($logType == 'ALL') {
+            foreach ($this->_logTypes as $tmp_logtype) {
+                $this->_format[$tmp_logtype] = $format;
+            }
+        } else {
+            $this->_format[$logType] = $format;
+        }
     }
 
     /**
@@ -150,7 +174,7 @@ abstract class Errorlog_Writer_Abstract {
     public function getMessage()
     {
         $tmpTable = '';
-        $format = (!is_null($this->_format)) ? $this->_format[$this->_activeLogType] : self::DEFAULT_FORMAT;
+        $format = $this->_format[$this->_activeLogType];
         foreach ($this->_logData as $key => $value)
         {
             if ($key == 'raised')
@@ -196,7 +220,7 @@ abstract class Errorlog_Writer_Abstract {
         $tmpTable = '<table>';
         foreach ($array as $tableKey => $tableValue)
         {
-            $tmpTable.= '<tr><td>' . $tableKey . '</td><td>' . $tableValue . '</td></tr>';
+            $tmpTable.= '<tr><td>' . $tableKey . '</td><td>' . print_r($tableValue,true) . '</td></tr>';
         }
         $tmpTable.= '</table>';
         return $tmpTable;
