@@ -248,10 +248,6 @@ class ErrorLog {
     public function logException(Exception $exception)
     {
         $data = array();
-        if ($this->dump_session_data)
-        {
-            $data['SESSION'] = $_SESSION;
-        }
         
         $logData = array(
             'message'    => $exception->getMessage(),
@@ -268,10 +264,6 @@ class ErrorLog {
     public function logPhpError($errno, $errstr, $errfile='', $errline=0, array $errcontext=array())
     {
         $data = array();
-        if ($this->dump_session_data)
-        {
-            $data['SESSION'] = $_SESSION;
-        }
         
         if (!empty($errorcontext))
         {
