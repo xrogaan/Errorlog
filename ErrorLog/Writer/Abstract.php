@@ -52,7 +52,7 @@ EOF;
                     $this->setFormat($format, $type);
                 }
              } else {
-                $this->setFormat($this->_config['formatter']['format'], $this->_config['formatter']['type']);
+                $this->setFormat($this->_config['formatter'], 'ALL');
             }
         }
 
