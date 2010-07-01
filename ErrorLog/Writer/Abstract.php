@@ -154,7 +154,7 @@ EOF;
              */
             //throw new ErrorException('Invalid logType given.');
             $format = self::DEFAULT_FORMAT;
-            $logType == ErrorLog::LOG_NONE;
+            $logType = ErrorLog::LOG_NONE;
             $this->_logData['extra'][] = 'WARNING: Invalid logType given. You are seeing the default log format';
         }
         
