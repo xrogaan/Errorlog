@@ -30,7 +30,7 @@ class ErrorLog_Writer_Syslog extends Errorlog_Writer_Abstract {
         ErrorLog::ALERT   => LOG_ALERT,
         ErrorLog::CRIT    => LOG_CRIT,
         ErrorLog::ERR     => LOG_ERR,
-        ErrorLog::WARNING => LOG_WARNING,
+        ErrorLog::WARN    => LOG_WARNING,
         ErrorLog::NOTICE  => LOG_NOTICE,
         ErrorLog::INFO    => LOG_INFO,
         ErrorLog::DEBUG   => LOG_DEBUG
