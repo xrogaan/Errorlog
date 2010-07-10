@@ -1,19 +1,20 @@
 A list of keywords used to fill the logs
 ================================================================================
-%message%   : Contain the main message. Report message if it's from php core, your
-              message if it's from you.
-%severity%  : The level of the error from 0 to 7. Lower is more serious.
-              EMERG   = 0 - Emergency: system is unusable
-              ALERT   = 1 - Alert: action must be taken immediately
-              CRIT    = 2 - Critical: critical conditions
-              ERR     = 3 - Error: error conditions
-              WARN    = 4 - Warning: warning conditions
-              NOTICE  = 5 - Notice: normal, but significant, condition
-              INFO    = 6 - Informational: informational messages
-              DEBUG   = 7 - Debug: debug-level messages
-%file%      : The file who raise the report
-%line%      : The line who raise the report
-%raised%    : ISO 8601 date (2004-02-12T15:19:21+00:00)
-%backtrace% : A full backtrace in text format.
-%params%    : POST, GET and COOKIE data as array
-%env%       : Environement data as array
+%message%    : Contain the main message. Report message if it's from php core, your
+               message if it's from you.
+%errorName%  : The severity label (see %errorLevel% for the list).
+%errorLevel% : The level of the report from 0 to 7. Lower is more serious.
+               EMERG   = 0 - Emergency: system is unusable
+               ALERT   = 1 - Alert: action must be taken immediately
+               CRIT    = 2 - Critical: critical conditions
+               ERR     = 3 - Error: error conditions
+               WARN    = 4 - Warning: warning conditions
+               NOTICE  = 5 - Notice: normal, but significant, condition
+               INFO    = 6 - Informational: informational messages
+               DEBUG   = 7 - Debug: debug-level messages
+%file%       : The file who raise the report
+%line%       : The line who raise the report
+%timestamp%  : ISO 8601 date (2004-02-12T15:19:21+00:00)
+%backtrace%  : A full backtrace in text format.
+%params%     : POST, GET and COOKIE data as array
+%env%        : Environement data as array
