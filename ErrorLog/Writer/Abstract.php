@@ -205,6 +205,63 @@ EOF;
         }
         return $format;
     }
+    
+    /**
+     * indent a string with another string
+     *
+     * @param string $value
+     * @param string $pad_lenght
+     */
+    function indent($value, $pad_lenght) {
+        return implode("\n$pad_lenght",explode("\n", $value));
+    }
+    
+    /**
+     * Format an array with a print_r like form.
+     *
+     * @param array $array
+     * @param int   $level
+     * @param int   $lastlen
+     */
+    function buildMessageFromArray(array $array, $level=1, $lastlen=0) {
+    
+        if (empty($array)) {
+            return '';
+        }
+        
+        $level = (int) $level;
+        
+        $pad_lenght = 0;
+        $tmplen = 0;
+        foreach ($array as $key => $value) {
+            $tmplen = strlen($key);
+            if ($pad_lenght < $tmplen) {
+                $pad_lenght = $tmplen;
+            }
+        }
+        unset($tmplen,$key,$value);
+        
+        $prekey = $llen = '';
+        $tmp='';
+        foreach ($array as $key => $value) {
+            if ($lastlen != 0 && $level != 1) {
+                $tmpllen = '    ';
+                for ($i=1; $i<$level; $llen.=$tmpllen,$i++);
+                $prekey = str_pad($llen, $lastlen, ' ');
+                $lastlen=0;
+            }
+            
+            $key = $prekey . str_pad($key, $pad_lenght, ' ',STR_PAD_LEFT);
+            
+            if (is_array($value)) {
+                $value = self::buildMessageFromArray($value, 1+$level, $pad_lenght);
+                $tmp.="$key:\n". $value;
+            } else {
+                $tmp.="$key: " . self::indent($value, str_pad('', strlen($key)+2), ' ') . "\n";
+            }
+        }
+        return $tmp;
+    }
 
     /**
      * Formats data from an array to a html table then return it.
@@ -212,7 +269,7 @@ EOF;
      * @param array $array 
      * @return string      Formatted string
      */
-    protected function buildMessageFromArray(array $array) {
+    protected function buildHtmlMessageFromArray(array $array) {
         if (empty($array))
         {
             return '';
@@ -221,7 +278,7 @@ EOF;
         $tmpTable = '<table>';
         foreach ($array as $tableKey => $tableValue)
         {
-            $tmpTable.= '<tr><td>' . $tableKey . '</td><td>' . print_r($tableValue,true) . '</td></tr>';
+            $tmpTable.= '<tr><td>' . $tableKey . '</td><td><pre>' . print_r($tableValue,true) . '</pre></td></tr>';
         }
         $tmpTable.= '</table>';
         return $tmpTable;
