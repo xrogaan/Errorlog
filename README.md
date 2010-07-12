@@ -12,4 +12,9 @@ Planed support :
   * Sqlite
   * MongoDB
 
-Support / bug report / feature requests on [lightouse](http://xrogaan.lighthouseapp.com/projects/53392-errorlog).
+Support / bug report / feature requests on our
+[mantisbt tracker](www.assembla.com/spaces/errorlog/tickets). You can also
+send an email to the mailing list at errorlog-help@lists.sourceforge.net.
+[Online subsciption](https://lists.sourceforge.net/lists/listinfo/errorlog-help)
+is available too.
+

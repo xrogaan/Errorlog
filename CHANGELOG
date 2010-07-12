@@ -4,7 +4,7 @@ CHANGES SINCE 1.0:
 MAJOR CHANGES:
  * buildMessageFromArray (in the abstract writer) will no longer return html
    tables, but instead a print_r like formatted message.
- * new buildHtmlMessageFromArray function who's basically the old
+ * New buildHtmlMessageFromArray function who's basically the old
    buildMessageFromArray function
 MINOR CHANGES:
  * Added more examples
