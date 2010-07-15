@@ -193,7 +193,7 @@ abstract class ErrorLog_Db_Adapter_Abstract {
     
     /**
      * Get initialized instance of an adapter or create one.
-     * @return Taplod_Db_Adapter_Abstract
+     * @return ErrorLog_Db_Adapter_Abstract
      */
     public function getConnection() {
         $this->_connect();
