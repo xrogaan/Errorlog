@@ -23,7 +23,7 @@ class ErrorLog_Db_Adapter_Pdo_Sqlite extends ErrorLog_Db_Adapter_Abstract {
         }
 
         if (!extension_loaded('pdo')) {
-            require 'ErrorLog_Exception.php';
+            require 'ErrorLog/Exception.php';
             throw new ErrorLog_Exception('The pdo is required for this adapter.');
         }
 
@@ -33,14 +33,14 @@ class ErrorLog_Db_Adapter_Pdo_Sqlite extends ErrorLog_Db_Adapter_Abstract {
             $this->_connection = new PDO($dsn);
             $this->_connection->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         } catch (PDOException $e) {
-            require_once 'ErrorLog_Exception.php';
+            require_once 'ErrorLog/Exception.php';
             throw new ErrorLog_Exception($e->getMessage());
         }
     }
 
         protected function _checkRequiredConfigOptions(array $config) {
             if (!array_key_exists('dbname', $config)) {
-                require_once 'ErrorLog_Exception.php';
+                require_once 'ErrorLog/Exception.php';
                 throw new ErrorLog_Exception("Configuration array must have a 'dbname' key.");
             }
         }
