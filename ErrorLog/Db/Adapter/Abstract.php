@@ -8,7 +8,7 @@
  * @license http://opensource.org/licenses/mit-license.php MIT license
  */
 
-abstract class ErrorLog_Db_Abstract {
+abstract class ErrorLog_Db_Adapter_Abstract {
 
     protected $_db_connection;
     protected $_config = array();
