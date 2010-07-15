@@ -2,9 +2,9 @@
 /**
  * Some work comes form taplod (http://github.com/xrogaan/taplod/)
  *
- * @category ErrorLog
- * @package ErrorLog_Db
- * @copyright Copyright (c) 2010, Ludovic Bellière
+ * @category Taplod
+ * @package Taplod_Db
+ * @copyright Copyright (c) 2009-2010, Ludovic Bellière
  * @license http://opensource.org/licenses/mit-license.php MIT license
  */
 
