@@ -38,12 +38,12 @@ class ErrorLog_Db_Adapter_Pdo_Sqlite extends ErrorLog_Db_Adapter_Abstract {
         }
     }
 
-        protected function _checkRequiredConfigOptions(array $config) {
-            if (!array_key_exists('dbname', $config)) {
-                require_once 'ErrorLog/Exception.php';
-                throw new ErrorLog_Exception("Configuration array must have a 'dbname' key.");
-            }
+    protected function _checkRequiredConfigOptions(array $config) {
+        if (!array_key_exists('dbname', $config)) {
+            require_once 'ErrorLog/Exception.php';
+            throw new ErrorLog_Exception("Configuration array must have a 'dbname' key.");
         }
+    }
 
     /**
      * (non-PHPdoc)
