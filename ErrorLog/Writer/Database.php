@@ -50,8 +50,19 @@ class ErrorLog_Writer_Database extends Errorlog_Writer_Abstract
      * @see ErrorLog/Writer/ErrorLog_Writer_Abstract#_write()
      */
     protected function _write() {
+        $this->_logData['timestamp'] = $this->_logData['raised'];
+        $this->_logData['timestamp'] = $this->_logData['raised'];
         
-    
+        if (isset($this->_logData['extra']) && is_array($this->_logData['extra'])) {
+            $this->_logData['extra'] = self::buildMessageFromArray($this->_logData['extra']);
+        }
+        if (isset($this->_logData['params']) && is_array($this->_logData['params'])) {
+            $this->_logData['params'] = self::buildMessageFromArray($this->_logData['params']);
+        }
+        if (isset($this->_logData['env']) && is_array($this->_logData['env'])) {
+            $this->_logData['env'] = self::buildMessageFromArray($this->_logData['env']);
+        }
+        
         $this->_db->insert($this->_config['table']);
     }
     
